@@ -3,6 +3,10 @@ import time
 #pylint:disable=unused-variable
 
 class ConfigCisco:
+  """
+  Configure device interfaces using information collected through CDP.
+  Only works for Cisco devices with cdp enabled.
+  """
 
   def __init__(self, hostname, username, password, command="show cdp neighbor | begin Device"):
     self.hostname = hostname
@@ -11,6 +15,9 @@ class ConfigCisco:
     self.command = command
 
   def show_cmd_ssh(self):
+    """
+    Runs commands on remote device(s) and returns output.
+    """
     try:
       conn = paramiko.SSHClient()
       conn.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -45,6 +52,9 @@ class ConfigCisco:
     return devices
   
   def configure_interfaces(self, device_dict):
+    """
+    Update remote device(s) and write configurations to memory.
+    """
     try:
       conn = paramiko.SSHClient()
       conn.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -67,7 +77,12 @@ class ConfigCisco:
       rtcon.send(command + '\n')
       time.sleep(1)
 
-config_class = ConfigCisco("200.0.0.1", "nms", "cisco")
+# Main execution
+sw_hostname = input("Hostname/IP: ")
+sw_username = input("Username: ")
+sw_password = input("Password: ")
+
+config_class = ConfigCisco(sw_hostname, sw_username, sw_password)
 
 results = config_class.show_cmd_ssh()
 
